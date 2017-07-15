@@ -77,6 +77,15 @@ class FbRequest {
         base_url = `https://graph.facebook.com/${api_v}/`;
     }
 
+    setToken (token) {
+        if (typeof token !== 'string') {
+            throw new Error(`Token must be a string`);
+        }
+
+        fb_access_token = token;
+        return fb_access_token;
+    }
+
     post ({ edge, fields, params, token }) {
         return processRequest({method: 'POST', url: urler({edge, fields, params, token})});
     }
