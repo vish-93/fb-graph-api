@@ -15,6 +15,11 @@ const fbRequest = new FbRequest(config);
 * Use a config token if you have a default token for all calls (eg system user)
 * Each individual request can override this token with a `token` param
 
+## SET NEW DEFAULT ACCESS TOKEN
+```
+fbRequest.setToken('') // token must be a string - empty string removes default token
+```
+
 ## GET 
 ```
 let data = await(fbRequest.get({
