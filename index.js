@@ -4,11 +4,9 @@ const async = require('asyncawait/async');
 const await = require('asyncawait/await');
 const request = require('request-promise');
 
-let fb_access_token;
 let api_v = 'v2.9';
-let base_url;
 
-let urler = ({edge, fields = '', params = {}, token = fb_access_token }) => {
+let urler = ({ base_url, edge, fields = '', params = {}, token }) => {
     let param_string = '',
         url = `${base_url}${edge}?fields=${fields}&access_token=${token}`;
 
@@ -22,7 +20,7 @@ let urler = ({edge, fields = '', params = {}, token = fb_access_token }) => {
         }
     }
     url += param_string;
-
+    console.log(url);
     return url;
 };
 
@@ -42,10 +40,10 @@ let processRequest = async(({ method, url }) => {
     }
 });
 
-let pageRequest = async(({ edge, fields, params, pages, token }) => {
+let pageRequest = async(({ base_url, edge, fields, params, pages, token }) => {
     let page = 0;
     let responses = [];
-    let url = urler({edge, fields, params, token});
+    let url = urler({base_url, edge, fields, params, token});
 
     while (!!url) {
         if (!!pages) {
@@ -72,35 +70,37 @@ class FbRequest {
             config = {};
         }
 
-        fb_access_token = config.token;
-        api_v = config.api || api_v;
-        base_url = `https://graph.facebook.com/${api_v}/`;
+        this.fb_access_token = config.token;
+        this.api_v = config.api || api_v;
+        this.base_url = `https://graph.facebook.com/${this.api_v}/`;
     }
-
+    test () {
+        console.log(this.fb_access_token);
+    }
     setToken (token) {
         if (typeof token !== 'string') {
             throw new Error(`Token must be a string`);
         }
 
-        fb_access_token = token;
-        return fb_access_token;
+        this.fb_access_token = token;
+        return this.fb_access_token;
     }
 
-    post ({ edge, fields, params, token }) {
-        return processRequest({method: 'POST', url: urler({edge, fields, params, token})});
+    post ({ edge, fields, params, token = this.fb_access_token }) {
+        return processRequest({method: 'POST', url: urler({base_url: this.base_url, edge, fields, params, token})});
     }
 
-    get ({ edge, fields, params, token }) {
-        return processRequest({method: 'GET', url: urler({edge, fields, params, token})});
+    get ({ edge, fields, params, token = this.fb_access_token }) {
+        return processRequest({method: 'GET', url: urler({base_url: this.base_url, edge, fields, params, token})});
     }
 
-    delete ({ edge, token }) {
-        return processRequest({method: 'DELETE', url: urler({edge, token})});
+    delete ({ edge, token = this.fb_access_token }) {
+        return processRequest({method: 'DELETE', url: urler({base_url: this.base_url, edge, token})});
     }
 
-    page ({ edge, fields, params, pages, token }) {
+    page ({ edge, fields, params, pages, token = this.fb_access_token }) {
         return async((() => {
-            return await(pageRequest({edge, fields, params, pages, token}));
+            return await(pageRequest({base_url: this.base_url, edge, fields, params, pages, token}));
         }))();
     }
 };
