@@ -20,7 +20,7 @@ let urler = ({ base_url, edge, fields = '', params = {}, token }) => {
         }
     }
     url += param_string;
-    console.log(url);
+
     return url;
 };
 
@@ -74,9 +74,7 @@ class FbRequest {
         this.api_v = config.api || api_v;
         this.base_url = `https://graph.facebook.com/${this.api_v}/`;
     }
-    test () {
-        console.log(this.fb_access_token);
-    }
+
     setToken (token) {
         if (typeof token !== 'string') {
             throw new Error(`Token must be a string`);
